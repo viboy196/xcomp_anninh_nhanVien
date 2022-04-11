@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "23345557727",
+    "firebase_url": "https://xcompanninh-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "xcompanninh",
+    "storage_bucket": "xcompanninh.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23345557727:android:ace4ef7186be8d8b02396a",
+        "android_client_info": {
+          "package_name": "com.anninh_nhanvien"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "23345557727-tc5oho76efm83v23q196m1eaukhd8i0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANURyB1cBAoRVxXUzirAlbOO2LHVfn1Qs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "23345557727-tc5oho76efm83v23q196m1eaukhd8i0j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23345557727:android:881aa48c1be041ce02396a",
+        "android_client_info": {
+          "package_name": "com.xcomp_anninh_nhanvien"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "23345557727-tc5oho76efm83v23q196m1eaukhd8i0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANURyB1cBAoRVxXUzirAlbOO2LHVfn1Qs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "23345557727-tc5oho76efm83v23q196m1eaukhd8i0j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23345557727:android:558fd59922ce5ef502396a",
+        "android_client_info": {
+          "package_name": "xcomp.anninh.nhanvien"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "23345557727-tc5oho76efm83v23q196m1eaukhd8i0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANURyB1cBAoRVxXUzirAlbOO2LHVfn1Qs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "23345557727-tc5oho76efm83v23q196m1eaukhd8i0j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
