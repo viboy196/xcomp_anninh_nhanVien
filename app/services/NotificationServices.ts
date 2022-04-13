@@ -27,7 +27,7 @@ export class NotificationServices {
       android: {
         channelId,
         chronometerDirection: 'up',
-        onlyAlertOnce: true,
+        // onlyAlertOnce: true,
         // smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
       },
     });

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 
 import {
   Text,
@@ -15,7 +15,6 @@ import {
 } from 'react-native-webrtc';
 // import Video from './components/Video';
 import Utils from '../utils';
-import GettingCall from '../screens/GettingCall';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/firestore';
 import {FirebaseFirestoreTypes} from '@react-native-firebase/firestore';
@@ -47,105 +46,62 @@ const configuration = {
   ],
 };
 
-export default function VideoTest({route}: RootStackScreenProps<'CallWebRtc'>) {
+export default function VideoTest({
+  route,
+  navigation,
+}: RootStackScreenProps<'CallWebRtc'>) {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
-  const [gettingCall, setGetTingCall] = useState(false);
 
   const [roomId, setRoomId] = useState<string>(route.params.roomId);
+  const [status, setStatus] = useState<string>(route.params.status);
 
   const pc = useRef<RTCPeerConnection>();
   const connecting = useRef(false);
-
-  // const cRef = useRef(
-  //   firebase.firestore().collection('meet').doc(`chatID_${roomId}`),
-  // );
   const cRef =
     useRef<
       FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>
     >();
-  useEffect(() => {
-    const subscribe = async () => {
-      if (cRef.current) {
-        cRef.current.onSnapshot(snapShot => {
-          const data = snapShot.data();
-          if (data === undefined) {
-            console.log('data underfined');
-            setGetTingCall(false);
-            return;
-          }
-          if (data !== undefined) {
-            const ls = Object.keys(data as object);
-            console.log('subscribe', Object.keys(data as object), data);
-            const index = ls.findIndex(x => x === 'offer');
-            if (index >= 0 && !connecting.current) {
-              if (!gettingCall) {
-                setGetTingCall(true);
-              }
-            }
-            console.log(index);
-          }
-          const answer = data?.answer;
-          if (pc.current && !pc.current.remoteDescription && data && answer) {
-            pc.current.setRemoteDescription(new RTCSessionDescription(answer));
-          }
-          // If there is offer for chatId set the getting call flag
-          if (data && data.offer && !connecting.current) {
-            setGetTingCall(true);
-          }
-        });
-      }
-    };
-    // On Delete of collection call hangup
-    // the other side has clicked on hangup
-    const subscribeDelete = async () => {
-      if (cRef.current) {
-        cRef.current.collection('callee').onSnapshot(snapShot => {
-          snapShot.docChanges().forEach(async change => {
-            if (change.type === 'removed') {
-              setGetTingCall(false);
-              connecting.current = false;
-              cRef.current = firebase
-                .firestore()
-                .collection('meet')
-                .doc(`chatID_${roomId}`);
-              const calleeCandidate = await cRef.current
-                .collection('callee')
-                .get();
-              calleeCandidate.forEach(async candidate => {
-                await candidate.ref.delete();
-              });
-              const callerCandidate = await cRef.current
-                .collection('caller')
-                .get();
-              callerCandidate.forEach(async candidate => {
-                await candidate.ref.delete();
-              });
-              cRef.current.delete();
 
-              if (localStream) {
-                localStream.getTracks().forEach(t => t.stop);
-                localStream.release();
-              }
-              setLocalStream(undefined);
-              setRemoteStream(undefined);
-              setRoomId('');
-            }
-            // Helper function
-          });
+  const subscribe = useCallback(async () => {
+    if (cRef.current) {
+      cRef.current.onSnapshot(snapShot => {
+        const data = snapShot.data();
+        if (data === undefined) {
+          console.log('data underfined');
+          return;
+        }
+        if (data !== undefined) {
+          console.log('subscribe', Object.keys(data as object), data);
+        }
+        const answer = data?.answer;
+        if (pc.current && !pc.current.remoteDescription && data && answer) {
+          pc.current.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+      });
+    }
+  }, []);
+  // On Delete of collection call hangup
+  // the other side has clicked on hangup
+  const subscribeDelete = async () => {
+    if (cRef.current) {
+      cRef.current.collection('callee').onSnapshot(snapShot => {
+        snapShot.docChanges().forEach(async change => {
+          if (change.type === 'removed') {
+            hangup();
+          }
+          // Helper function
         });
-      }
-    };
-    return () => {
-      subscribe();
-      subscribeDelete();
-    };
-  }, [gettingCall, localStream, roomId]);
+      });
+    }
+  };
+
   const setupWebRtc = async () => {
     pc.current = new RTCPeerConnection(configuration);
     // lấy luồng stream âm thanh và video
     const stream = await Utils.getStream();
-
+    await subscribe();
+    await subscribeDelete();
     if (stream) {
       setLocalStream(stream);
       pc.current.addStream(stream);
@@ -195,7 +151,6 @@ export default function VideoTest({route}: RootStackScreenProps<'CallWebRtc'>) {
   const join = async () => {
     console.log('join zoom ....');
     connecting.current = true;
-    setGetTingCall(false);
     cRef.current = firebase
       .firestore()
       .collection('meet')
@@ -230,13 +185,19 @@ export default function VideoTest({route}: RootStackScreenProps<'CallWebRtc'>) {
    * And delete the document for the call
    */
   const hangup = async () => {
-    setGetTingCall(false);
+    setStatus('');
     connecting.current = false;
-    firestoreCleanUp();
-    streamCleanUp();
+
     if (pc.current) {
       pc.current.close();
     }
+    firestoreCleanUp().then(() => {
+      streamCleanUp().then(() => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
+      });
+    });
   };
 
   const firestoreCleanUp = async () => {
@@ -275,6 +236,7 @@ export default function VideoTest({route}: RootStackScreenProps<'CallWebRtc'>) {
 
       // khi có sự kiện icecandidate
       // thêm môt ice candidate vào firestore
+
       pc.current.onicecandidate = event => {
         const _event = event as any;
         console.log('on icecandidate ', _event.candidate);
@@ -293,11 +255,19 @@ export default function VideoTest({route}: RootStackScreenProps<'CallWebRtc'>) {
       });
     }
   };
-
+  if (status === 'call') {
+    setStatus('');
+    create();
+  }
+  if (status === 'answer') {
+    setStatus('');
+    join();
+  }
   // hiển thị màn hình chờ
-  if (gettingCall) {
-    return <GettingCall hangup={hangup} join={join} />;
-  } else if (localStream) {
+  // if (gettingCall) {
+  //   return <GettingCall hangup={hangup} join={join} />;
+  // } else
+  if (localStream) {
     // hiển thị màn hình call
     return (
       <Video

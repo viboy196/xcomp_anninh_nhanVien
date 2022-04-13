@@ -8,10 +8,10 @@ export default function TabTwoScreen({
   navigation,
 }: RootTabScreenProps<'TabTwo'>) {
   const WebRtc = React.useCallback(
-    (roomId: string) => {
+    (roomId: string, status: 'call' | 'answer') => {
       console.log('open WebRtc');
 
-      navigation.navigate('CallWebRtc', {roomId});
+      navigation.navigate('CallWebRtc', {roomId, status});
     },
     [navigation],
   );

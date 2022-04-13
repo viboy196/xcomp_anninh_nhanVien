@@ -1,7 +1,6 @@
 import {combineReducers} from 'redux';
 
-import authNotificationReducer from '../features/notification/AuthNotificationSlice1';
-// import notificationReducer from '../features/notification/NotificationSlice';
+import notificationReducer from '../features/notification/NotificationSlice';
 
 import authReducer from '../features/auth/authSlices';
 import registerReducer from '../features/register/registerSlices';
@@ -12,6 +11,5 @@ import registerReducer from '../features/register/registerSlices';
 export default combineReducers({
   auth: authReducer,
   register: registerReducer,
-  authNotification: authNotificationReducer,
-  //   notification: notificationReducer,
+  notification: notificationReducer,
 });

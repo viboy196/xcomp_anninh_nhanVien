@@ -1,17 +1,17 @@
 import React, {useState} from 'react';
 import {TouchableOpacity} from 'react-native';
+import {NotificationType} from '../../redux/features/notification/NotificationSlice';
 import {View, Text} from '../Themed';
 // import {useAppDispatch} from '../../redux/store/hooks';
 type Props = {
-  item: any;
-  WebRtc: (roomId: string) => void;
+  item: NotificationType;
+  WebRtc: (roomId: string, status: 'call' | 'answer') => void;
 };
 const ItemNotification = (props: Props) => {
   // const dispatch = useAppDispatch();
-  const [item, setItem] = useState(props.item);
+  const [item, setItem] = useState<NotificationType>(props.item);
+  // console.log('item', item);
   const date = new Date(item.time);
-  console.log('item', item);
-
   const txtDate = `${`0${date.getHours()}`.slice(
     -2,
   )}:${`0${date.getMinutes()}`.slice(-2)}`;
@@ -20,10 +20,10 @@ const ItemNotification = (props: Props) => {
     <TouchableOpacity
       onPress={() => {
         if (!item.isClick) {
-          const _item = {...item, isClick: true};
+          const _item: NotificationType = {...item, isClick: true};
           setItem(_item);
           console.log(_item);
-          props.WebRtc(_item.roomId);
+          props.WebRtc(_item.roomId, 'answer');
         }
       }}
       style={{

@@ -21,9 +21,16 @@ import RegisterScreen from '../screens/register';
 
 // import {setToken} from '../redux/features/notification/AuthNotificationSlice1';
 // import {addNotification} from '../redux/features/notification/NotificationSlice';
-import {/*useAppDispatch ,*/ useAppSelector} from '../redux/store/hooks';
+import {useAppDispatch, useAppSelector} from '../redux/store/hooks';
+import messaging from '@react-native-firebase/messaging';
 
 import VideoTest from '../test/VideoTest';
+import {NotificationServices} from '../services/NotificationServices';
+import ApiRequest from '../utils/api/Main/ApiRequest';
+import {
+  addNotification,
+  NotificationType,
+} from '../redux/features/notification/NotificationSlice';
 // import {useRef, useState} from 'react';
 
 export default function Navigation({
@@ -47,30 +54,50 @@ export default function Navigation({
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+  const dispatch = useAppDispatch();
+  React.useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('unsubscribe', remoteMessage);
+      let time = remoteMessage.sentTime
+        ? remoteMessage.sentTime
+        : new Date().getTime();
+
+      const item: NotificationType = {
+        title: remoteMessage.notification?.title
+          ? remoteMessage.notification?.title
+          : '',
+        IdCongViec: remoteMessage.data?.IdCongViec
+          ? remoteMessage.data?.IdCongViec
+          : '',
+        body: remoteMessage.notification?.body
+          ? remoteMessage.notification?.body
+          : '',
+        time,
+        isClick: false,
+        roomId: remoteMessage.data?.roomId ? remoteMessage.data?.roomId : '',
+      };
+      console.log(item);
+
+      dispatch(addNotification({noti: item}));
+      NotificationServices.onDisplayNotification(
+        remoteMessage.notification?.title,
+        remoteMessage.notification?.body,
+        remoteMessage.data,
+      );
+    });
+
+    return unsubscribe;
+  }, [dispatch]);
   const auth = useAppSelector(state => state.auth);
-  //   const notificationData = useAppSelector(state => state.authNotification);
-  //   const [state, setState] = React.useState(null);
-
-  //   console.log('notificationData', notificationData.token);
-
-  //   const fetchMyAPI = React.useCallback(
-  //     async (notiToken: string, token: string) => {
-  //       console.log('notification activeApp');
-
-  //       const res = await ActivateApp(notiToken, token);
-  //       if (res.status) {
-  //         console.log('ActivateApp suscess');
-  //       }
-  //     },
-  //     [],
-  //   );
-  //   React.useEffect(() => {
-  //     if (auth.token && notificationData.token) {
-  //       console.log('start active app');
-
-  //       fetchMyAPI(notificationData.token, auth.token);
-  //     }
-  //   }, [notificationData.token, auth.token]);
+  React.useEffect(() => {
+    NotificationServices.getTokenFirebase().then(token => {
+      if (auth.token) {
+        ApiRequest.ActivateApp(token, auth.token).then(res => {
+          console.log('ActivateApp', res.status);
+        });
+      }
+    });
+  }, [auth.token]);
 
   console.log('RootNavigator', auth);
 

@@ -1,16 +1,18 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';;
-import * as Notifications from 'expo-notifications';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {persistReducer} from 'redux-persist';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+
 export type NotificationType = {
-  isClick: Boolean;
-  notification: Notifications.Notification;
+  title: string;
+  IdCongViec: string;
+  body: string;
+  isClick: boolean;
+  roomId: string;
+  time: number;
 };
 
 export type NotificationsType = {
   notifications: Array<NotificationType>;
   numNotSee: number;
-}
+};
 const initialState = {
   notifications: [],
   numNotSee: 0,
@@ -25,45 +27,47 @@ export const NotificationSlice = createSlice({
       state = {
         ...state,
         notifications: [action.payload.noti, ...state.notifications],
-        numNotSee: state.numNotSee + 1,,
+        numNotSee: state.numNotSee + 1,
       };
-      return state;;
+      return state;
     },
     updateNotification(state, action: PayloadAction<{noti: NotificationType}>) {
       const index = state.notifications.findIndex(
-        it => it.notification.date === action.payload.noti.notification.date,;
+        it => it.time === action.payload.noti.time,
       );
-      console.log('updateNotification index:', action.payload.noti);;
+      console.log('updateNotification index:', action.payload.noti);
 
       const arr = [
         ...state.notifications.slice(0, index),
         action.payload.noti,
-        ...state.notifications.slice(index + 1),;
+        ...state.notifications.slice(index + 1),
       ];
-      state = {...state, notifications: arr, numNotSee: state.numNotSee - 1};;
-      return state;;
+      state = {...state, notifications: arr, numNotSee: state.numNotSee - 1};
+      return state;
     },
-    removeNotification(state) {
-      return {notifications: [], numNotiView: 0, numNotSee: 0};;
+    removeNotification() {
+      return {notifications: [], numNotiView: 0, numNotSee: 0};
     },
 
     removeCountNotifi(state) {
-      return {...state, numNotSee: 0};;
+      return {...state, numNotSee: 0};
     },
-
+    setNotification(
+      state,
+      action: PayloadAction<{noti: Array<NotificationType>}>,
+    ) {
+      state = {...state, notifications: action.payload.noti};
+      return state;
     },
-});;
+  },
+});
 
 export const {
   addNotification,
   updateNotification,
   removeNotification,
   removeCountNotifi,
-} = NotificationSlice.actions;;
-const persistConfig = {
-  key: 'root',
-  storage: AsyncStorage,
-};
+  setNotification,
+} = NotificationSlice.actions;
 
-export default persistReducer(persistConfig, NotificationSlice.reducer);
-
+export default NotificationSlice.reducer;

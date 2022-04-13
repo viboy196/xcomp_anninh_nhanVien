@@ -1,5 +1,5 @@
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import {tintColorLight} from '../constants/Colors';
 // import {useAppSelector} from '../redux/store/hooks';
@@ -7,31 +7,46 @@ import ItemNotification from './items/ItemNotification';
 import {View, Text} from './Themed';
 import {useAppDispatch, useAppSelector} from '../redux/store/hooks';
 import ApiRequest from '../utils/api/Main/ApiRequest';
-import {logOut} from '../redux/features/auth/authSlices';
 type Props = {
-  WebRtc: (roomId: string) => void;
+  WebRtc: (roomId: string, status: 'call' | 'answer') => void;
 };
 import uuid from 'react-native-uuid';
+import {
+  NotificationType,
+  setNotification,
+} from '../redux/features/notification/NotificationSlice';
 
 const Notifications = (props: Props) => {
   // const {notifications} = useAppSelector(state => state.notification);
   const auth = useAppSelector(state => state.auth);
-  const [notifications, setNotifications] = useState<Array<any>>([]);
+  const {notifications} = useAppSelector(state => state.notification);
+  console.log('notifications.length : ', notifications.length);
+
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (auth.token) {
       ApiRequest.GetListNoti(auth.token)
         .then(data => {
           const arrStr = data.result as Array<string>;
-          let arrAny = Array<any>();
+          let arrNoti = Array<NotificationType>();
           arrStr.forEach(value => {
             const obj = JSON.parse(value);
-            arrAny = [{...obj, isClick: false}, ...arrAny];
+            console.log(obj);
+
+            const item: NotificationType = {
+              title: obj.title,
+              body: obj.body,
+              IdCongViec: obj.IdCongViec,
+              roomId: obj.roomId,
+              isClick: false,
+              time: Date.parse(obj.time),
+            };
+            arrNoti = [item, ...arrNoti];
           });
-          setNotifications(arrAny);
+          dispatch(setNotification({noti: arrNoti}));
         })
         .catch(() => {
-          dispatch(logOut());
+          // dispatch(logOut());
         });
     }
   }, [auth.token, dispatch]);
@@ -50,13 +65,15 @@ const Notifications = (props: Props) => {
           />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={notifications}
-        renderItem={({item}) => (
-          <ItemNotification item={item} WebRtc={props.WebRtc} />
-        )}
-        key={uuid.v4() as string}
-      />
+      {notifications && (
+        <FlatList
+          data={notifications}
+          renderItem={({item}) => (
+            <ItemNotification item={item} WebRtc={props.WebRtc} />
+          )}
+          key={uuid.v4() as string}
+        />
+      )}
     </View>
   );
 };

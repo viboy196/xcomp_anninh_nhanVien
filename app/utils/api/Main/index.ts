@@ -40,7 +40,7 @@ export const GetListCongviecBySystemAnninh = async (data: {
   };
   try {
     const res = await axios.get(url, config);
-    console.log(`${tag} data:`, res.data);
+    // console.log(`${tag} data:`, res.data);
     return res.data as ExcuteResult;
   } catch (error) {
     return {status: false, errorMessage: Unauthorized};
@@ -53,7 +53,7 @@ export const ActivateApp = async (
 ): Promise<ExcuteResult> => {
   console.log('urlActivateApp ', urlActivateApp);
 
-  console.log(tokenNotification, token);
+  // console.log(tokenNotification, token);
 
   const config = {
     headers: {
