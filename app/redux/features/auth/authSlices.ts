@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {persistReducer} from 'redux-persist';
-import {LoginApi} from '../../../utils/api';
+import ApiRequest from '../../../utils/api/Main/ApiRequest';
 
 export type UsersState = {
   token?: string;
@@ -17,7 +17,7 @@ export const loginAsync = createAsyncThunk(
   'auth/login',
   // if you type your function argument here
   async (input: {phone: string; password: string}) => {
-    return await LoginApi(input);
+    return await ApiRequest.LoginApi(input);
   },
 );
 

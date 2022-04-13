@@ -1,0 +1,51 @@
+// import messaging from '@react-native-firebase/messaging';
+// import notifee, {AndroidImportance} from '@notifee/react-native';
+// // import AsyncStorage from '@react-native-community/async-storage';
+// // import React from 'react';
+
+// async function requestUserPermission() {
+//   const authStatus = await messaging().requestPermission();
+//   const enabled =
+//     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+//     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+//   if (enabled) {
+//     console.log('Firebase authorization:', authStatus);
+//   }
+// }
+
+// export const checkToken = async () => {
+//   const fcmToken = await messaging().getToken();
+//   if (fcmToken) {
+//     console.log(fcmToken);
+//   }
+//   //   await AsyncStorage.setItem('fcmToken', fcmToken);
+// };
+
+// export default async function getNotification() {
+//   const channelId = await notifee.createChannel({
+//     id: 'important',
+//     name: 'Important Notifications',
+//     importance: AndroidImportance.HIGH,
+//   });
+
+//   await notifee.displayNotification({
+//     title: '<p><b>Verandering bij proces: {naam}</span></p></b></p>',
+//     body: '{user} heeft het proces {procesnaam} afgekeurd',
+//     data: {
+//       processId: '12345678',
+//     },
+//     android: {
+//       channelId,
+//       importance: AndroidImportance.HIGH,
+//       smallIcon: 'ic_notification',
+//       //largeIcon: require('../../assets/images/apple-touch-icon.png'),
+//       pressAction: {
+//         id: 'default',
+//         launchActivity: 'default',
+//       },
+//     },
+//   });
+// }
+
+// checkToken();
+// requestUserPermission();

@@ -25,6 +25,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 // import Icon from 'react-native-vector-icons/Ionicons';
 
 import Video from '../components/Video';
+import {RootStackScreenProps} from '../navigation/types';
 
 // const configuration = {iceServers: [{url: 'stun:stun.l.google.com:19302'}]};
 const configuration = {
@@ -46,11 +47,13 @@ const configuration = {
   ],
 };
 
-export default function App() {
+export default function VideoTest({route}: RootStackScreenProps<'CallWebRtc'>) {
   const [localStream, setLocalStream] = useState<MediaStream>();
   const [remoteStream, setRemoteStream] = useState<MediaStream>();
   const [gettingCall, setGetTingCall] = useState(false);
-  const [roomId, setRoomId] = useState('');
+
+  const [roomId, setRoomId] = useState<string>(route.params.roomId);
+
   const pc = useRef<RTCPeerConnection>();
   const connecting = useRef(false);
 
@@ -334,8 +337,6 @@ export default function App() {
             Facebook
           </Icon.Button>
         </View>
-
-        <Icon name="ios-person" size={30} color="#4F8EF7" />
       </View>
     );
   }

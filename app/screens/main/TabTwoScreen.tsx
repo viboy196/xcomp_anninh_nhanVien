@@ -1,36 +1,31 @@
-// import {View} from '../../components/Themed';
-// import Notifications from '../../components/Notification';
-// import {RootTabScreenProps} from '../../navigation/types';
-// import {StyleSheet} from 'react-native';
-
-// export default function TabTwoScreen({}: RootTabScreenProps<'TabTwo'>) {
-//   // const openWebRtc = () => {
-//   //   navigation.navigate('CallWebRtc');
-//   // };
-//   return (
-//     <View style={styles.container}>
-//       <Notifications />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     marginTop: 15,
-
-//     width: '100%',
-//     height: '100%',
-//   },
-// });
-
-///////////////////////////////////////////
-import {View, Text} from 'react-native';
+import {View} from '../../components/Themed';
+import {StyleSheet} from 'react-native';
+import Notifications from '../../components/Notification';
 import React from 'react';
+import {RootTabScreenProps} from '../../navigation/types';
 
-export default function TabTwoScreen() {
+export default function TabTwoScreen({
+  navigation,
+}: RootTabScreenProps<'TabTwo'>) {
+  const WebRtc = React.useCallback(
+    (roomId: string) => {
+      console.log('open WebRtc');
+
+      navigation.navigate('CallWebRtc', {roomId});
+    },
+    [navigation],
+  );
   return (
-    <View>
-      <Text>TabTwoScreen</Text>
+    <View style={styles.container}>
+      <Notifications WebRtc={WebRtc} />
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 15,
+
+    width: '100%',
+    height: '100%',
+  },
+});

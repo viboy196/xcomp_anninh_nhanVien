@@ -23,6 +23,7 @@ import RegisterScreen from '../screens/register';
 // import {addNotification} from '../redux/features/notification/NotificationSlice';
 import {/*useAppDispatch ,*/ useAppSelector} from '../redux/store/hooks';
 
+import VideoTest from '../test/VideoTest';
 // import {useRef, useState} from 'react';
 
 export default function Navigation({
@@ -92,6 +93,11 @@ function RootNavigator() {
       <Stack.Screen
         name="Register"
         component={RegisterScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CallWebRtc"
+        component={VideoTest}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

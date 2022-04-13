@@ -25,7 +25,7 @@ export type RootStackParamList = {
   Modal: undefined;
   NotFound: undefined;
   ActiveDevice: undefined;
-  CallWebRtc: undefined;
+  CallWebRtc: {roomId: string};
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

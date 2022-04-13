@@ -11,7 +11,6 @@ import {
   validatePassword,
   validatePhoneNumber,
 } from '../../utils/validate';
-import {validatePathConfig} from '@react-navigation/native';
 import {RootStackScreenProps} from '../../navigation/types';
 // import {FontAwesome} from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome5';

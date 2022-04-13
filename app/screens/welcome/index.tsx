@@ -1,12 +1,10 @@
-import { Text, View } from "../../components/Themed";
-import { useAppSelector } from "../../redux/store/hooks";
-import { RootStackScreenProps } from "../../types";
+import {Text, View} from '../../components/Themed';
+// import {useAppSelector} from '../../redux/store/hooks';
+// import {RootStackScreenProps} from '../../types';
 
-const WelCome = ({ navigation }: RootStackScreenProps<"WelCome">) => {
-
-
+const WelCome = () => {
   return (
-    <View >
+    <View>
       <Text>Màn hình WelCome</Text>
     </View>
   );
