@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {
   Text,
@@ -63,45 +63,38 @@ export default function VideoTest({
       FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>
     >();
 
-  const subscribe = useCallback(async () => {
-    if (cRef.current) {
-      cRef.current.onSnapshot(snapShot => {
-        const data = snapShot.data();
-        if (data === undefined) {
-          console.log('data underfined');
-          return;
-        }
-        if (data !== undefined) {
-          console.log('subscribe', Object.keys(data as object), data);
-        }
-        const answer = data?.answer;
-        if (pc.current && !pc.current.remoteDescription && data && answer) {
-          pc.current.setRemoteDescription(new RTCSessionDescription(answer));
-        }
-      });
-    }
-  }, []);
-  // On Delete of collection call hangup
-  // the other side has clicked on hangup
-  const subscribeDelete = async () => {
-    if (cRef.current) {
-      cRef.current.collection('callee').onSnapshot(snapShot => {
-        snapShot.docChanges().forEach(async change => {
-          if (change.type === 'removed') {
-            hangup();
-          }
-          // Helper function
-        });
-      });
-    }
-  };
+  // const subscribe = async () => {
+  //   if (cRef.current) {
+  //     cRef.current.onSnapshot(snapShot => {
+  //       const data = snapShot.data();
+  //       if (data === undefined) {
+  //         console.log('data underfined');
+  //         return;
+  //       }
+  //       if (data !== undefined) {
+  //         console.log('subscribe', Object.keys(data as object), data);
+  //       }
+  //       const answer = data?.answer;
+  //       if (pc.current && !pc.current.remoteDescription && data && answer) {
+  //         pc.current.setRemoteDescription(new RTCSessionDescription(answer));
+  //       }
+  //     });
+
+  //     cRef.current.collection('callee').onSnapshot(snapShot => {
+  //       snapShot.docChanges().forEach(async change => {
+  //         if (change.type === 'removed') {
+  //           hangup();
+  //         }
+  //         // Helper function
+  //       });
+  //     });
+  //   }
+  // };
 
   const setupWebRtc = async () => {
     pc.current = new RTCPeerConnection(configuration);
     // lấy luồng stream âm thanh và video
     const stream = await Utils.getStream();
-    await subscribe();
-    await subscribeDelete();
     if (stream) {
       setLocalStream(stream);
       pc.current.addStream(stream);
@@ -236,6 +229,30 @@ export default function VideoTest({
 
       // khi có sự kiện icecandidate
       // thêm môt ice candidate vào firestore
+
+      mReft.onSnapshot(snapShot => {
+        const data = snapShot.data();
+        if (data === undefined) {
+          console.log('data underfined');
+          return;
+        }
+        if (data !== undefined) {
+          console.log('subscribe', Object.keys(data as object), data);
+        }
+        const answer = data?.answer;
+        if (pc.current && !pc.current.remoteDescription && data && answer) {
+          pc.current.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+      });
+
+      mReft.collection('callee').onSnapshot(snapShot => {
+        snapShot.docChanges().forEach(async change => {
+          if (change.type === 'removed') {
+            hangup();
+          }
+          // Helper function
+        });
+      });
 
       pc.current.onicecandidate = event => {
         const _event = event as any;
