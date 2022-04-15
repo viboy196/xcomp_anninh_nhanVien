@@ -20,7 +20,7 @@ const ItemNotification = (props: Props) => {
     <TouchableOpacity
       onPress={() => {
         if (!item.isClick) {
-          const _item: NotificationType = {...item, isClick: true};
+          const _item: NotificationType = {...item, isClick: false};
           setItem(_item);
           console.log(_item);
           props.WebRtc(_item.roomId, 'answer');

@@ -24,7 +24,7 @@ import RegisterScreen from '../screens/register';
 import {useAppDispatch, useAppSelector} from '../redux/store/hooks';
 import messaging from '@react-native-firebase/messaging';
 
-import VideoTest from '../test/VideoTest';
+import VideoTest from '../components/Video';
 import {NotificationServices} from '../services/NotificationServices';
 import ApiRequest from '../utils/api/Main/ApiRequest';
 import {

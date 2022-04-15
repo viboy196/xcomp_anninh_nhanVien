@@ -1546,6 +1546,11 @@
   resolved "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.5.tgz"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
+"@types/react-native-incall-manager@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.npmjs.org/@types/react-native-incall-manager/-/react-native-incall-manager-3.2.1.tgz"
+  integrity sha512-M+Ffgw1A7nPZSxvEdK/enCdfHhS8/oQ1QDZ6w9+6IwR3RHE3EDywMuHy8BiDJ7oM3q6yU6uSWSvhsCI/hrxGlQ==
+
 "@types/react-native-vector-icons@^6.4.10":
   version "6.4.10"
   resolved "https://registry.npmjs.org/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.10.tgz"
@@ -6107,6 +6112,11 @@ react-native-gradle-plugin@^0.0.5:
   integrity sha512-kGupXo+pD2mB6Z+Oyowor3qlCroiS32FNGoiGQdwU19u8o+NNhEZKwoKfC5Qt03bMZSmFlcAlTyf79vrS2BZKQ==
   dependencies:
     react-native-codegen "*"
+
+react-native-incall-manager@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.npmjs.org/react-native-incall-manager/-/react-native-incall-manager-3.3.0.tgz"
+  integrity sha512-SvomgHUoKqVso/BGv02b4ndBqenlqYqW3pptZz5qHwteidKFNWI6ny+PPw5X55MdK0lyTbzBoiT3DwS06Qu0lg==
 
 react-native-safe-area-context@^4.2.4:
   version "4.2.4"

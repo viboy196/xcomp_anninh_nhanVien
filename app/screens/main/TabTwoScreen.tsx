@@ -1,17 +1,31 @@
 import {View} from '../../components/Themed';
-import {StyleSheet} from 'react-native';
+import {Alert, StyleSheet} from 'react-native';
 import Notifications from '../../components/Notification';
 import React from 'react';
 import {RootTabScreenProps} from '../../navigation/types';
-
+import {WebRtcServices} from '../../services/WebRtcServices';
+import IncallManager from 'react-native-incall-manager';
 export default function TabTwoScreen({
   navigation,
 }: RootTabScreenProps<'TabTwo'>) {
   const WebRtc = React.useCallback(
-    (roomId: string, status: 'call' | 'answer') => {
+    async (roomId: string) => {
       console.log('open WebRtc');
 
-      navigation.navigate('CallWebRtc', {roomId, status});
+      const _webRtcService = new WebRtcServices({
+        roomId,
+      });
+      await _webRtcService.join({
+        success: () => {
+          navigation.navigate('CallWebRtc');
+        },
+        failer: () => {
+          Alert.alert('cuộc gọi đã kết thúc');
+        },
+      });
+      _webRtcService.setSpeaker(false);
+      IncallManager.setSpeakerphoneOn(false);
+      IncallManager.setForceSpeakerphoneOn(false);
     },
     [navigation],
   );

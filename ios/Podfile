@@ -23,6 +23,8 @@ target 'xcomp_anninh_nhanVien' do
 
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
 
+  pod 'ReactNativeIncallManager', :path => '../node_modules/react-native-incall-manager'
+
   target 'xcomp_anninh_nhanVienTests' do
     inherit! :complete
     # Pods for testing
