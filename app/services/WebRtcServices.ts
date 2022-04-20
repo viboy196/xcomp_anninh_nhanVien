@@ -8,24 +8,18 @@ import {
 } from 'react-native-webrtc';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/firestore';
-// const configuration = {
-//   iceServers: [
-//     {urls: ['stun:hk-turn1.xirsys.com']},
-//     {
-//       username:
-//         'x8w5WLKrzM-Syir6HnFKQFG6y1sobLQpOTkAIM3Lj8xbuPo3UeIQzAQN3Q0HW18AAAAAAGJTyEx2aWJveTE5Ng==',
-//       credential: '420db210-b95f-11ec-b5af-0242ac120004',
-//       urls: [
-//         'turn:hk-turn1.xirsys.com:80?transport=udp',
-//         'turn:hk-turn1.xirsys.com:3478?transport=udp',
-//         'turn:hk-turn1.xirsys.com:80?transport=tcp',
-//         'turn:hk-turn1.xirsys.com:3478?transport=tcp',
-//         'turns:hk-turn1.xirsys.com:443?transport=tcp',
-//         'turns:hk-turn1.xirsys.com:5349?transport=tcp',
-//       ],
-//     },
-//   ],
-// };
+
+const configuration = {
+  iceServers: [
+    {urls: ['stun:171.244.133.171:3478']},
+    {
+      username: 'xcomp',
+      credential: 'xcomp',
+      urls: ['turn:171.244.133.171:3478'],
+    },
+  ],
+};
+// const configuration = {iceServers: [{url: 'stun:171.244.133.171:3478'}]};
 export class WebRtcServices {
   static instead?: WebRtcServices;
   #localStream?: MediaStream;
@@ -37,24 +31,7 @@ export class WebRtcServices {
 
   constructor(input: {roomId: string}) {
     this.#roomId = input.roomId;
-    this.#configuration = {
-      iceServers: [
-        {urls: ['stun:hk-turn1.xirsys.com']},
-        {
-          username:
-            'x8w5WLKrzM-Syir6HnFKQFG6y1sobLQpOTkAIM3Lj8xbuPo3UeIQzAQN3Q0HW18AAAAAAGJTyEx2aWJveTE5Ng==',
-          credential: '420db210-b95f-11ec-b5af-0242ac120004',
-          urls: [
-            'turn:hk-turn1.xirsys.com:80?transport=udp',
-            'turn:hk-turn1.xirsys.com:3478?transport=udp',
-            'turn:hk-turn1.xirsys.com:80?transport=tcp',
-            'turn:hk-turn1.xirsys.com:3478?transport=tcp',
-            'turns:hk-turn1.xirsys.com:443?transport=tcp',
-            'turns:hk-turn1.xirsys.com:5349?transport=tcp',
-          ],
-        },
-      ],
-    };
+    this.#configuration = configuration;
     this.#pc = new RTCPeerConnection(this.#configuration);
     this.#cRef = firebase
       .firestore()
@@ -189,9 +166,9 @@ export class WebRtcServices {
       }
     }
   };
-  setConfiguration(configuration: any) {
+  setConfiguration(_configuration: any) {
     if (WebRtcServices.instead) {
-      WebRtcServices.instead.#configuration = configuration;
+      WebRtcServices.instead.#configuration = _configuration;
       WebRtcServices.instead.#pc = new RTCPeerConnection(
         WebRtcServices.instead.#configuration,
       );
