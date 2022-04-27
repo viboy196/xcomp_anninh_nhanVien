@@ -5,7 +5,7 @@ const host = 'http://api.kachiusa.vn/api';
 axios.defaults.baseURL = host;
 const urlLogin = '/Auth/login?v=1.0';
 
-const urlRegister = '/api/NguoiDung/register?v=1.0';
+const urlRegister = '/NguoiDung/register?v=1.0';
 
 const urlDetail = '/NguoiDung/Detail?v=1.0';
 

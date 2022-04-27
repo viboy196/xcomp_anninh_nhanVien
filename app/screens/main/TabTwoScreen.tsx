@@ -1,26 +1,53 @@
 import {View} from '../../components/Themed';
-import {Alert, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import Notifications from '../../components/Notification';
 import React from 'react';
 import {RootTabScreenProps} from '../../navigation/types';
 import {WebRtcServices} from '../../services/WebRtcServices';
 import IncallManager from 'react-native-incall-manager';
+
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/firestore';
+
+import uuid from 'react-native-uuid';
+export type RoomState = {
+  roomId: string;
+  stateToken: string;
+};
 export default function TabTwoScreen({
   navigation,
 }: RootTabScreenProps<'TabTwo'>) {
   const WebRtc = React.useCallback(
-    async (roomId: string) => {
+    async (item: RoomState) => {
       console.log('open WebRtc');
 
       const _webRtcService = new WebRtcServices({
-        roomId,
+        roomId: item.roomId,
       });
       await _webRtcService.join({
         success: () => {
           navigation.navigate('CallWebRtc');
         },
-        failer: () => {
-          Alert.alert('cuộc gọi đã kết thúc');
+        failer: async () => {
+          const roomIdNew = uuid.v4() as string;
+          console.log('roomId', roomIdNew);
+
+          const _wrtc = new WebRtcServices({
+            roomId: roomIdNew,
+          });
+
+          _wrtc.create().then(() => {
+            navigation.navigate('CallWebRtc');
+            _wrtc.setSpeaker(false);
+
+            firebase
+              .firestore()
+              .collection(`user_${item.stateToken}`)
+              .add({roomId: roomIdNew})
+              .then(() => {
+                console.log('send stateToken success');
+              });
+          });
         },
       });
       _webRtcService.setSpeaker(false);

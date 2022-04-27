@@ -127,13 +127,13 @@ const Input = (props: {
       </View>
       <View
         style={{
-          marginLeft: 10,
-          marginRight: 10,
-          paddingLeft: 70,
-          marginBottom: 10,
+          position: 'absolute',
+          width: '100%',
+          bottom: -2,
+          left: 60,
         }}>
         {errorMessages !== undefined && errorMessages !== '' && (
-          <Text>{errorMessages}</Text>
+          <Text style={{color: 'red'}}>{errorMessages}</Text>
         )}
       </View>
     </View>
@@ -147,8 +147,10 @@ const styles = StyleSheet.create({
   texForm: {
     marginLeft: 10,
     marginRight: 10,
+    marginBottom: 15,
     marginTop: 5,
     borderRadius: 10,
     padding: 5,
+    backgroundColor: '#fff',
   },
 });

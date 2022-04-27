@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 24,
     fontWeight: '700',
+    color: '#fff',
   },
   inputForm: {
     flex: 1,

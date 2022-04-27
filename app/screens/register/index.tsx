@@ -1,8 +1,5 @@
-import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
-
-import {useAppDispatch} from '../../redux/store/hooks';
-import {registerAsync} from '../../redux/features/register/registerSlices';
+import React, {useCallback, useState} from 'react';
+import {Alert, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {View, Text} from '../../components/Themed';
 import Input from '../../components/items/InputForm';
@@ -15,30 +12,41 @@ import {RootStackScreenProps} from '../../navigation/types';
 // import {FontAwesome} from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {tintColorLight} from '../../constants/Colors';
+import ApiRequest from '../../utils/api/Main/ApiRequest';
+import {InputRegister} from '../../utils/api/apiTypes';
+import {AppName} from '../../utils/AppType';
 
 const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
-  const dispatch = useAppDispatch();
+  const [textFullName, setTextFullName] = useState('');
 
-  const [textFullName, setTextFullName] = useState('Nguyễn Văn Đàn');
+  const [textPhone, setTextPhone] = useState('');
 
-  const [textPhone, setTextPhone] = useState('0988888888');
+  const [textPassword, setTextPassword] = useState('');
 
-  const [textPassword, setTextPassword] = useState('123456');
+  const [textPasswordRedo, setTextPasswordRedo] = useState('');
 
-  const [textPasswordRedo, setTextPasswordRedo] = useState('123456');
+  const registerApi = useCallback(async (input: InputRegister) => {
+    const res = await ApiRequest.RegisterApi(input);
+    console.log('registerApi', res);
+    if (res.errorMessage === 'Object was exist') {
+      Alert.alert('Lỗi', 'số điện thoại đã được đăng ký');
+    }
+    if (res.status === true) {
+      Alert.alert('Thành công', 'Đăng ký thành công');
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
       <View
         style={{
-          flex: 1,
-          justifyContent: 'center',
           alignItems: 'center',
+          marginBottom: 60,
         }}>
         <TouchableOpacity
           style={{
             position: 'absolute',
-            top: 50,
+            top: 20,
             left: 25,
           }}
           onPress={() => navigation.goBack()}>
@@ -57,8 +65,9 @@ const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
             fontSize: 32,
             color: '#fff',
             fontWeight: '700',
+            top: 10,
           }}>
-          Y TẾ MỚI
+          {AppName}
         </Text>
       </View>
       <View style={styles.loginForm}>
@@ -74,7 +83,7 @@ const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
               setTextFullName(text);
             }}
             style={{marginLeft: 10, marginRight: 10}}
-            icon="user"
+            icon="users"
             color={tintColorLight}
             errorMessages={
               validateName(textFullName) ? undefined : 'Tên không hợp lệ'
@@ -106,7 +115,7 @@ const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
               setTextPassword(text);
             }}
             style={{marginLeft: 10, marginRight: 10}}
-            icon="keyboard-o"
+            icon="key"
             color={tintColorLight}
             secureTextEntry={true}
             errorMessages={
@@ -123,7 +132,7 @@ const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
               setTextPasswordRedo(text);
             }}
             style={{marginLeft: 10, marginRight: 10}}
-            icon="keyboard-o"
+            icon="key"
             color={tintColorLight}
             secureTextEntry={true}
             errorMessages={
@@ -132,59 +141,60 @@ const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
                 : 'Mật khẩu không trùng khớp'
             }
           />
-          <View style={{flex: 1, backgroundColor: '#ecf0f1'}}></View>
           <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
+              height: 100,
             }}>
             <TouchableOpacity
               onPress={() => {
-                dispatch(
-                  registerAsync({
-                    phone: textPhone,
-                    password: textPassword,
-                    fullName: textFullName,
-                    email: 'viboy196@gmail.com',
-                  }),
-                );
+                registerApi({
+                  fullName: textFullName,
+                  email: 'viboy196@gmail.com',
+                  password: textPassword,
+                  phone: textPhone,
+                });
               }}>
               <View
                 style={{
-                  width: 300,
+                  width: 200,
                   height: 60,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  backgroundColor: tintColorLight,
+                  backgroundColor: '#fff',
                   borderRadius: 30,
-                  marginBottom: 10,
+                  marginBottom: 2,
                 }}>
                 <Text
                   style={{
                     fontSize: 20,
                     fontWeight: '700',
-                    color: '#fff',
+                    color: tintColorLight,
                   }}>
                   Đăng ký
                 </Text>
               </View>
             </TouchableOpacity>
-            <View
-              style={{
-                flexDirection: 'row',
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
 
-                marginBottom: 10,
-              }}>
-              <Text>Quay lại </Text>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text
-                  style={{
-                    color: tintColorLight,
-                  }}>
-                  đăng nhập
-                </Text>
-              </TouchableOpacity>
-            </View>
+              marginBottom: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 10,
+            }}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontStyle: 'italic',
+                }}>
+                quay lại ĐĂNG NHẬP
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -206,15 +216,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    marginTop: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0)',
   },
   titleText: {
     marginVertical: 10,
     fontSize: 24,
     fontWeight: '700',
+    color: '#fff',
   },
   inputForm: {
     flex: 1,

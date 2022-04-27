@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {NotificationType} from '../../redux/features/notification/NotificationSlice';
+import {RoomState} from '../../screens/main/TabTwoScreen';
 import {View, Text} from '../Themed';
 // import {useAppDispatch} from '../../redux/store/hooks';
 type Props = {
   item: NotificationType;
-  WebRtc: (roomId: string, status: 'call' | 'answer') => void;
+  WebRtc: (item: RoomState) => void;
 };
 const ItemNotification = (props: Props) => {
   // const dispatch = useAppDispatch();
@@ -22,8 +23,9 @@ const ItemNotification = (props: Props) => {
         if (!item.isClick) {
           const _item: NotificationType = {...item, isClick: false};
           setItem(_item);
+          const data = JSON.parse(_item.roomId);
           console.log(_item);
-          props.WebRtc(_item.roomId, 'answer');
+          props.WebRtc({roomId: data.roomId, stateToken: data.stateToken});
         }
       }}
       style={{

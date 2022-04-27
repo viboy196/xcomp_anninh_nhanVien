@@ -28,8 +28,11 @@ export class WebRtcServices {
   #configuration: any;
   #roomId: string;
   #cRef: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>;
-
+  #countHangup?: number;
+  updateRemoteStream?: () => void;
   constructor(input: {roomId: string}) {
+    console.log('new object WebRtcServices');
+
     this.#roomId = input.roomId;
     this.#configuration = configuration;
     this.#pc = new RTCPeerConnection(this.#configuration);
@@ -37,7 +40,7 @@ export class WebRtcServices {
       .firestore()
       .collection('meet')
       .doc(`chatID_${this.#roomId}`);
-
+    this.#countHangup = 1;
     WebRtcServices.instead = this;
   }
 
@@ -59,6 +62,9 @@ export class WebRtcServices {
           // setRemoteStream(_stream);
           if (WebRtcServices.instead) {
             WebRtcServices.instead.#RemoteStream = _stream;
+            if (WebRtcServices.instead.updateRemoteStream) {
+              WebRtcServices.instead.updateRemoteStream();
+            }
           }
         }
       };
@@ -77,6 +83,8 @@ export class WebRtcServices {
   create = async () => {
     if (WebRtcServices.instead) {
       console.log('gọi ....');
+      console.log('roomId ... :', WebRtcServices.instead.#roomId);
+
       await WebRtcServices.instead.#setupWebRtc();
       await WebRtcServices.instead.#collectIceCandidates(
         WebRtcServices.instead.#cRef,
@@ -102,22 +110,27 @@ export class WebRtcServices {
     }
   };
   hangup = async () => {
+    console.log('hangup');
     if (WebRtcServices.instead) {
+      WebRtcServices.instead.#countHangup = 0;
       WebRtcServices.instead.#pc.close();
 
       await WebRtcServices.instead.#firestoreCleanUp();
-      if (WebRtcServices.instead.#localStream) {
-        WebRtcServices.instead.#localStream.getTracks().forEach(t => t.stop);
-        WebRtcServices.instead.#localStream.release();
-      }
 
-      WebRtcServices.instead.#localStream = undefined;
-      WebRtcServices.instead.#RemoteStream = undefined;
+      if (WebRtcServices.instead) {
+        if (WebRtcServices.instead.#localStream) {
+          WebRtcServices.instead.#localStream.getTracks().forEach(t => t.stop);
+          WebRtcServices.instead.#localStream.release();
+        }
 
-      if (WebRtcServices.instead.#hangupSuccess) {
-        WebRtcServices.instead.#hangupSuccess();
+        WebRtcServices.instead.#localStream = undefined;
+        WebRtcServices.instead.#RemoteStream = undefined;
+
+        if (WebRtcServices.instead.#hangupSuccess) {
+          WebRtcServices.instead.#hangupSuccess();
+        }
+        WebRtcServices.instead = undefined;
       }
-      WebRtcServices.instead = undefined;
     }
   };
   #hangupSuccess?: () => void;
@@ -161,8 +174,9 @@ export class WebRtcServices {
         }
       } else {
         console.log('đầu dây không tồn tại');
-        input.failer();
-        WebRtcServices.instead.hangup();
+        WebRtcServices.instead.hangup().then(() => {
+          input.failer();
+        });
       }
     }
   };
@@ -176,9 +190,13 @@ export class WebRtcServices {
   }
   setSpeaker = (isSpeaker: boolean) => {
     if (WebRtcServices.instead) {
-      WebRtcServices.instead.#pc
-        .getLocalStreams()[0]
-        .getAudioTracks()[0].enabled = isSpeaker;
+      try {
+        WebRtcServices.instead.#pc
+          .getLocalStreams()[0]
+          .getAudioTracks()[0].enabled = isSpeaker;
+      } catch (error) {
+        console.log('LỖi set setSpeaker');
+      }
     }
   };
   setVideo = (isvideo: boolean) => {
@@ -194,6 +212,8 @@ export class WebRtcServices {
     remoteName: string,
   ) => {
     if (WebRtcServices.instead) {
+      console.log('collectIceCandidates');
+
       const candidateCollection = mReft.collection(localName);
       if (WebRtcServices.instead.#pc) {
         // lắng nghe sự kiện có stream vào connection
@@ -234,7 +254,9 @@ export class WebRtcServices {
                 WebRtcServices.instead.#pc.addIceCandidate(candidate);
               }
               if (change.type === 'removed') {
-                WebRtcServices.instead.hangup();
+                if (WebRtcServices.instead.#countHangup === 1) {
+                  WebRtcServices.instead.hangup();
+                }
               }
             }
           });

@@ -8,13 +8,14 @@ import {View, Text} from './Themed';
 import {useAppDispatch, useAppSelector} from '../redux/store/hooks';
 import ApiRequest from '../utils/api/Main/ApiRequest';
 type Props = {
-  WebRtc: (roomId: string, status: 'call' | 'answer') => void;
+  WebRtc: (item: RoomState) => void;
 };
 import uuid from 'react-native-uuid';
 import {
   NotificationType,
   setNotification,
 } from '../redux/features/notification/NotificationSlice';
+import {RoomState} from '../screens/main/TabTwoScreen';
 
 const Notifications = (props: Props) => {
   // const {notifications} = useAppSelector(state => state.notification);

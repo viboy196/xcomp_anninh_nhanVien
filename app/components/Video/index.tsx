@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {RTCView} from 'react-native-webrtc';
 import Button from '../items/Button';
@@ -84,6 +84,7 @@ export default function Video({
   const [volume, setVolume] = useState(false);
   const [mic, setMic] = useState(false);
   const [isVideo, setIsVideo] = useState(true);
+  const [reload, setReaload] = useState(false);
 
   const volumeClick = useCallback(() => {
     let _vo = !volume;
@@ -118,6 +119,7 @@ export default function Video({
   console.log('remoteStream', remoteStream?.toURL());
   useEffect(() => {
     if (WebRtcServices.instead) {
+      WebRtcServices.instead.updateRemoteStream = () => setReaload(old => !old);
       WebRtcServices.instead.setHangupSuccess({
         navigate: () => {
           if (navigation.canGoBack()) {
@@ -150,12 +152,17 @@ export default function Video({
           />
         )}
         {isVideo && (
-          <RTCView
-            streamURL={localStream.toURL()}
-            objectFit={'cover'}
-            style={styles.videoLocal}
-            zOrder={1}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              localStream.getVideoTracks()[0]._switchCamera();
+            }}
+            style={styles.videoLocal}>
+            <RTCView
+              streamURL={localStream.toURL()}
+              objectFit={'cover'}
+              style={styles.videoLocal}
+            />
+          </TouchableOpacity>
         )}
         <ButtonContainer
           hangup={hangup}
@@ -171,6 +178,7 @@ export default function Video({
   } else if (localStream && !remoteStream) {
     return (
       <View style={styles.container}>
+        {reload && <View />}
         <RTCView
           streamURL={localStream.toURL()}
           objectFit={'cover'}
