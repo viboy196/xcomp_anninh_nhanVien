@@ -23,9 +23,15 @@ const ItemNotification = (props: Props) => {
         if (!item.isClick) {
           const _item: NotificationType = {...item, isClick: false};
           setItem(_item);
-          const data = JSON.parse(_item.roomId);
-          console.log(_item);
-          props.WebRtc({roomId: data.roomId, stateToken: data.stateToken});
+          try {
+            const data = JSON.parse(_item.data.info);
+            console.log(_item);
+            if (data.roomId && data.stateToken) {
+              props.WebRtc({roomId: data.roomId, stateToken: data.stateToken});
+            }
+          } catch (error) {
+            console.log('fail convert ');
+          }
         }
       }}
       style={{

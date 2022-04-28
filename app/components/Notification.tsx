@@ -28,19 +28,19 @@ const Notifications = (props: Props) => {
     if (auth.token) {
       ApiRequest.GetListNoti(auth.token)
         .then(data => {
-          const arrStr = data.result as Array<string>;
+          const arrStr = data.result.listNotification as Array<any>;
+          console.log(arrStr);
+
           let arrNoti = Array<NotificationType>();
           arrStr.forEach(value => {
-            const obj = JSON.parse(value);
-            console.log(obj);
+            console.log(value);
 
             const item: NotificationType = {
-              title: obj.title,
-              body: obj.body,
-              IdCongViec: obj.IdCongViec,
-              roomId: obj.roomId,
+              title: value.notification.title as string,
+              body: value.notification.body as string,
               isClick: false,
-              time: Date.parse(obj.time),
+              time: Date.parse(value.dateTime),
+              data: value.data,
             };
             arrNoti = [item, ...arrNoti];
           });

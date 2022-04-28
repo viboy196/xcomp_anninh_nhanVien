@@ -14,14 +14,17 @@ const urlActivateApp = '/App/active-app?v=1.0';
 const urlGetTienichAnninhByNguoidung =
   '/CongViec/get-list-congviec-by-system-anninh?v=1.0';
 
-const urlGetListNoti = '/Noti/get-list-noti?v=1.0';
-
+// const urlGetListNoti = '/Noti/get-list-noti?v=1.0';
+const getUrlGetListNoti = (typeApp: string): string => {
+  return `Noti/get-list-noti?StrTypeApp=${typeApp}&v=1.0`;
+};
 export default class ApiRequest {
   // export const host = 'http://e874-113-185-51-101.ngrok.io'
 
   static GetListNoti = async (token: string): Promise<ExcuteResult> => {
     const tag = 'GetListNoti';
-    console.log(`${tag} url:`, urlGetListNoti);
+    const url = getUrlGetListNoti('nhanvien');
+    console.log(`${tag} url:`, url);
 
     const config: AxiosRequestConfig = {
       headers: {
@@ -29,7 +32,7 @@ export default class ApiRequest {
         accept: 'text/plain',
       },
     };
-    const res = await axios.get(urlGetListNoti, config);
+    const res = await axios.get(url, config);
     console.log(`${tag} data key.length :`, Object.keys(res.data).length);
     return res.data as ExcuteResult;
   };
@@ -64,25 +67,24 @@ export default class ApiRequest {
     console.log(`${tag} data key.length :`, Object.keys(res.data).length);
     return res.data as ExcuteResult;
   };
-  static ActivateApp = async (
-    tokenNotification: string,
-    token: string,
-  ): Promise<ExcuteResult> => {
+  static ActivateApp = async (input: {
+    tokenAuth: string;
+    tokenFirebase: string;
+    typeApp: string;
+  }): Promise<ExcuteResult> => {
     console.log('urlActivateApp ', urlActivateApp);
 
-    console.log(tokenNotification, token);
     const tag = 'ActivateApp';
     const config = {
       headers: {
-        Authorization: `bearer ${token}`,
+        Authorization: `bearer ${input.tokenAuth}`,
         accept: 'text/plain',
       },
     };
 
     const bodyParameters = {
-      appToken: tokenNotification,
-      device: 'firebase',
-      typeApp: 'nhanvien',
+      token: input.tokenFirebase,
+      typeApp: input.typeApp,
     };
     const res = await axios.post(urlActivateApp, bodyParameters, config);
     console.log(`${tag} data key.length :`, Object.keys(res.data).length);

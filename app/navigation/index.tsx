@@ -66,15 +66,12 @@ function RootNavigator() {
         title: remoteMessage.notification?.title
           ? remoteMessage.notification?.title
           : '',
-        IdCongViec: remoteMessage.data?.IdCongViec
-          ? remoteMessage.data?.IdCongViec
-          : '',
         body: remoteMessage.notification?.body
           ? remoteMessage.notification?.body
           : '',
         time,
         isClick: false,
-        roomId: remoteMessage.data?.roomId ? remoteMessage.data?.roomId : '',
+        data: remoteMessage.data,
       };
       console.log(item);
 
@@ -92,8 +89,12 @@ function RootNavigator() {
   React.useEffect(() => {
     NotificationServices.getTokenFirebase().then(token => {
       if (auth.token) {
-        ApiRequest.ActivateApp(token, auth.token).then(res => {
-          console.log('ActivateApp', res.status);
+        ApiRequest.ActivateApp({
+          tokenFirebase: token,
+          tokenAuth: auth.token,
+          typeApp: 'nhanvien',
+        }).then(res => {
+          console.log('ActivateApp', res.status, res.errorMessage);
         });
       }
     });

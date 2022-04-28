@@ -2,10 +2,9 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 export type NotificationType = {
   title: string;
-  IdCongViec: string;
   body: string;
   isClick: boolean;
-  roomId: string;
+  data: any;
   time: number;
 };
 
