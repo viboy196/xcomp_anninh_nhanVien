@@ -23,6 +23,8 @@ const ItemNotification = (props: Props) => {
         if (!item.isClick) {
           const _item: NotificationType = {...item, isClick: false};
           setItem(_item);
+          console.log(_item);
+
           try {
             const data = JSON.parse(_item.data.info);
             console.log(_item);
