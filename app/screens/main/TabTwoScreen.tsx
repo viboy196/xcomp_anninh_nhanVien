@@ -39,13 +39,12 @@ export default function TabTwoScreen({
           _wrtc.create().then(() => {
             navigation.navigate('CallWebRtc');
             _wrtc.setSpeaker(false);
-
             firebase
-              .firestore()
-              .collection(`user_${item.stateToken}`)
-              .add({roomId: roomIdNew})
-              .then(() => {
-                console.log('send stateToken success');
+              .database()
+              .ref('user')
+              .child(item.stateToken)
+              .push({roomId: roomIdNew}, () => {
+                console.log('send roomID success');
               });
           });
         },
@@ -64,9 +63,8 @@ export default function TabTwoScreen({
 }
 const styles = StyleSheet.create({
   container: {
-    marginTop: 15,
-
     width: '100%',
     height: '100%',
+    backgroundColor: '#fff',
   },
 });

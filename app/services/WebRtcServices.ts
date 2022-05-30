@@ -1,4 +1,3 @@
-import {FirebaseFirestoreTypes} from '@react-native-firebase/firestore';
 import {
   mediaDevices,
   MediaStream,
@@ -7,7 +6,8 @@ import {
   RTCSessionDescription,
 } from 'react-native-webrtc';
 import firebase from '@react-native-firebase/app';
-import '@react-native-firebase/firestore';
+import '@react-native-firebase/database';
+import {FirebaseDatabaseTypes} from '@react-native-firebase/database';
 
 const configuration = {
   iceServers: [
@@ -19,6 +19,9 @@ const configuration = {
     },
   ],
 };
+
+// const OFFER = 'offer';
+// const ANSWER = 'answer';
 // const configuration = {iceServers: [{url: 'stun:171.244.133.171:3478'}]};
 export class WebRtcServices {
   static instead?: WebRtcServices;
@@ -27,7 +30,7 @@ export class WebRtcServices {
   #pc: RTCPeerConnection;
   #configuration: any;
   #roomId: string;
-  #cRef: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>;
+  #cRef: FirebaseDatabaseTypes.Reference;
   #countHangup?: number;
   updateRemoteStream?: () => void;
   constructor(input: {roomId: string}) {
@@ -37,9 +40,9 @@ export class WebRtcServices {
     this.#configuration = configuration;
     this.#pc = new RTCPeerConnection(this.#configuration);
     this.#cRef = firebase
-      .firestore()
-      .collection('meet')
-      .doc(`chatID_${this.#roomId}`);
+      .database()
+      .ref('meet')
+      .child(`chatID_${this.#roomId}`);
     this.#countHangup = 1;
     WebRtcServices.instead = this;
   }
@@ -99,13 +102,11 @@ export class WebRtcServices {
         WebRtcServices.instead.#pc.setLocalDescription(offer);
 
         const cWithOffer = {
-          offer: {
-            type: offer.type,
-            sdp: offer.sdp,
-          },
+          type: offer.type,
+          sdp: offer.sdp,
         };
 
-        WebRtcServices.instead.#cRef.set(cWithOffer);
+        WebRtcServices.instead.#cRef.child('offer').set(cWithOffer);
       }
     }
   };
@@ -142,7 +143,9 @@ export class WebRtcServices {
   join = async (input: {success: () => void; failer: () => void}) => {
     if (WebRtcServices.instead) {
       console.log('join zoom ....');
-      const offer = (await WebRtcServices.instead.#cRef.get()).data()?.offer;
+      const offer = (
+        await WebRtcServices.instead.#cRef.child('offer').once('value')
+      ).val();
       console.log('doc', `chatID_${WebRtcServices.instead.#roomId}`);
 
       if (offer) {
@@ -164,12 +167,10 @@ export class WebRtcServices {
             (await WebRtcServices.instead.#pc.createAnswer()) as RTCSessionDescription;
           WebRtcServices.instead.#pc.setLocalDescription(answer);
           const cWithAnswer = {
-            answer: {
-              type: answer.type,
-              sdp: answer.sdp,
-            },
+            type: answer.type,
+            sdp: answer.sdp,
           };
-          WebRtcServices.instead.#cRef.update(cWithAnswer);
+          WebRtcServices.instead.#cRef.child('answer').set(cWithAnswer);
           input.success();
         }
       } else {
@@ -207,14 +208,14 @@ export class WebRtcServices {
     }
   };
   #collectIceCandidates = async (
-    mReft: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>,
+    mReft: FirebaseDatabaseTypes.Reference,
     localName: string,
     remoteName: string,
   ) => {
     if (WebRtcServices.instead) {
       console.log('collectIceCandidates');
 
-      const candidateCollection = mReft.collection(localName);
+      const candidateCollection = mReft.child(localName);
       if (WebRtcServices.instead.#pc) {
         // lắng nghe sự kiện có stream vào connection
 
@@ -225,17 +226,15 @@ export class WebRtcServices {
           const _event = event as any;
           console.log('on icecandidate ', _event.candidate);
           if (_event.candidate) {
-            candidateCollection.add(_event.candidate);
+            candidateCollection.push(_event.candidate);
           }
         };
-        mReft.onSnapshot(snapShot => {
-          const data = snapShot.data();
-          const answer = data?.answer;
+        mReft.child('answer').on('value', snapShot => {
+          const answer = snapShot.val();
           if (WebRtcServices.instead) {
             if (
               WebRtcServices.instead.#pc &&
               !WebRtcServices.instead.#pc.remoteDescription &&
-              data &&
               answer
             ) {
               WebRtcServices.instead.#pc.setRemoteDescription(
@@ -245,40 +244,35 @@ export class WebRtcServices {
           }
         });
         // get candidate to signal
-        mReft.collection(remoteName).onSnapshot(snapshot => {
-          snapshot.docChanges().forEach((change: any) => {
-            console.log('change.type :', change.type, 'remoteName', remoteName);
-            if (WebRtcServices.instead) {
-              if (change.type === 'added') {
-                const candidate = new RTCIceCandidate(change.doc.data());
-                WebRtcServices.instead.#pc.addIceCandidate(candidate);
-              }
-              if (change.type === 'removed') {
-                if (WebRtcServices.instead.#countHangup === 1) {
-                  WebRtcServices.instead.hangup();
-                }
-              }
+        mReft.child(remoteName).on('child_added', snapshot => {
+          const candidate = new RTCIceCandidate(snapshot.val());
+          if (WebRtcServices.instead) {
+            WebRtcServices.instead.#pc.addIceCandidate(candidate);
+          }
+        });
+        WebRtcServices.instead.#cRef.on('child_removed', () => {
+          if (WebRtcServices.instead) {
+            if (WebRtcServices.instead.#countHangup === 1) {
+              WebRtcServices.instead.hangup();
             }
-          });
+          }
         });
       }
     }
   };
   #firestoreCleanUp = async () => {
     if (WebRtcServices.instead) {
-      const calleeCandidate = await WebRtcServices.instead.#cRef
-        .collection('callee')
-        .get();
-      calleeCandidate.forEach(async candidate => {
-        await candidate.ref.delete();
-      });
-      const callerCandidate = await WebRtcServices.instead.#cRef
-        .collection('caller')
-        .get();
-      callerCandidate.forEach(async candidate => {
-        await candidate.ref.delete();
-      });
-      WebRtcServices.instead.#cRef.delete();
+      const calleeCandidate = await WebRtcServices.instead.#cRef.child(
+        'callee',
+      );
+      calleeCandidate.remove();
+
+      const callerCandidate = await WebRtcServices.instead.#cRef.child(
+        'caller',
+      );
+      callerCandidate.remove();
+
+      WebRtcServices.instead.#cRef.remove();
     }
   };
   #getStream = async (input: {

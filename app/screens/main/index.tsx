@@ -35,6 +35,9 @@ export default function MainScreen() {
       initialRouteName="TabOne"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
+
+        tabBarInactiveBackgroundColor: '#fff',
+        tabBarActiveBackgroundColor: '#fff',
       }}>
       <BottomTab.Screen
         name="TabOne"

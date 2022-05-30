@@ -33,7 +33,7 @@ const ItemCongViec = (props: Props) => {
           }}>
           {data.loaiCongViec}
         </Text>
-        <View style={{flex: 1}} lightColor="#f7f7f7"></View>
+        <View style={{flex: 1}} lightColor="#f7f7f7" />
         <TouchableOpacity
           style={{
             justifyContent: 'center',
@@ -50,7 +50,9 @@ const ItemCongViec = (props: Props) => {
               margin: 5,
               borderRadius: 5,
             }}>
-            <Text lightColor="white">Làm việc</Text>
+            <Text lightColor="white" darkColor="white">
+              Làm việc
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -63,7 +65,8 @@ const ItemCongViec = (props: Props) => {
         <View
           style={{
             margin: 10,
-          }}></View>
+          }}
+        />
       </View>
     </View>
   );
