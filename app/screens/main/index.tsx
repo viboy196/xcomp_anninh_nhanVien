@@ -6,20 +6,27 @@ import Colors from '../../constants/Colors';
 import useColorScheme from '../../hooks/useColorScheme';
 // import {removeCountNotifi} from '../../redux/features/notification/NotificationSlice';
 // import {useAppDispatch} from '../../redux/store/hooks';
-import {RootTabParamList /*,RootTabScreenProps*/} from '../../navigation/types';
+import {
+  RootStackScreenProps,
+  RootTabParamList /*,RootTabScreenProps*/,
+} from '../../navigation/types';
 import TabOneScreen from './TabOneScreen';
 import TabThreeScreen from './TabThreeScreen';
-import TabTwoScreen from './TabTwoScreen';
+import TabTwoScreen, {RoomState} from './TabTwoScreen';
 
 import Icon from 'react-native-vector-icons/FontAwesome5';
-
+import {WebRtcServices} from '../../services/WebRtcServices';
+import {firebase} from '@react-native-firebase/database';
+import IncallManager from 'react-native-incall-manager';
+import uuid from 'react-native-uuid';
+import {NotificationServices} from '../../services/NotificationServices';
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
  * https://reactnavigation.org/docs/bottom-tab-navigator
  */
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
-export default function MainScreen() {
+export default function MainScreen({navigation}: RootStackScreenProps<'Main'>) {
   const colorScheme = useColorScheme();
   // const numNotSee = useAppSelector(state => state.notification.numNotSee);
   // const dispatch = useAppDispatch();
@@ -30,6 +37,47 @@ export default function MainScreen() {
   // };
   // console.log('MainScreen', numNotSee);
 
+  const WebRtc = React.useCallback(
+    async (item: RoomState) => {
+      console.log('open WebRtc');
+
+      const _webRtcService = new WebRtcServices({
+        roomId: item.roomId,
+      });
+      await _webRtcService.join({
+        success: () => {
+          navigation.navigate('CallWebRtc');
+        },
+        failer: async () => {
+          const roomIdNew = uuid.v4() as string;
+          console.log('roomId', roomIdNew);
+
+          const _wrtc = new WebRtcServices({
+            roomId: roomIdNew,
+          });
+
+          _wrtc.create().then(() => {
+            navigation.navigate('CallWebRtc');
+            _wrtc.setSpeaker(false);
+            firebase
+              .database()
+              .ref('user')
+              .child(item.stateToken)
+              .push({roomId: roomIdNew}, () => {
+                console.log('send roomID success');
+              });
+          });
+        },
+      });
+      _webRtcService.setSpeaker(false);
+      IncallManager.setSpeakerphoneOn(false);
+      IncallManager.setForceSpeakerphoneOn(false);
+    },
+    [navigation],
+  );
+  NotificationServices.WebRtc = (item: RoomState) => {
+    WebRtc(item);
+  };
   return (
     <BottomTab.Navigator
       initialRouteName="TabOne"

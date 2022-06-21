@@ -55,6 +55,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   const dispatch = useAppDispatch();
+
   React.useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('unsubscribe', remoteMessage);
@@ -76,6 +77,21 @@ function RootNavigator() {
       console.log(item);
 
       dispatch(addNotification({noti: item}));
+
+      try {
+        const data = JSON.parse(item.data.info);
+        console.log(item);
+        if (data.roomId && data.stateToken) {
+          if (NotificationServices.WebRtc) {
+            NotificationServices.WebRtc({
+              roomId: data.roomId,
+              stateToken: data.stateToken,
+            });
+          }
+        }
+      } catch (error) {
+        console.log('fail convert ');
+      }
       NotificationServices.onDisplayNotification(
         remoteMessage.notification?.title,
         remoteMessage.notification?.body,

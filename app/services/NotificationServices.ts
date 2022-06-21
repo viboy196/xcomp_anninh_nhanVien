@@ -3,7 +3,9 @@ import notifee, {
   AndroidVisibility,
 } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
+import {RoomState} from '../screens/main/TabTwoScreen';
 export class NotificationServices {
+  static WebRtc?: (item: RoomState) => void;
   static async onDisplayNotification(
     title: string = '',
     body: string = '',
