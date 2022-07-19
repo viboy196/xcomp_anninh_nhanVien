@@ -1,7 +1,7 @@
 export interface ExcuteResult {
+  code?: string;
   errorMessage?: string;
   result?: any | string;
-  status: boolean;
 }
 
 export type InputRegister = {

@@ -12,6 +12,10 @@ const linking: LinkingOptions<RootStackParamList> = {
   prefixes: ['mychat://'],
   config: {
     screens: {
+      KhuVucDoScreen: 'KhuVucDoScreen',
+      ChiTietSoDoScreen: 'ChiTietSoDoScreen',
+      DoChiSo: 'DoChiSo',
+      DoNuoc: 'DoNuoc',
       WelCome: 'WelCome',
       Login: 'Login',
       Register: 'Register',

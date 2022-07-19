@@ -31,7 +31,7 @@ const Register = ({navigation}: RootStackScreenProps<'Register'>) => {
     if (res.errorMessage === 'Object was exist') {
       Alert.alert('Lỗi', 'số điện thoại đã được đăng ký');
     }
-    if (res.status === true) {
+    if (res.code === '00') {
       Alert.alert('Thành công', 'Đăng ký thành công');
     }
   }, []);

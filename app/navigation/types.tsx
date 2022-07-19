@@ -26,6 +26,10 @@ export type RootStackParamList = {
   NotFound: undefined;
   ActiveDevice: undefined;
   CallWebRtc: undefined;
+  KhuVucDoScreen: {tollAreaId: string; tollAreaName: string};
+  DoChiSo: {waterUserId?: string; waterUserName?: string};
+  ChiTietSoDoScreen: {waterUserId: string; waterUserName: string};
+  DoNuoc: {userId: string};
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

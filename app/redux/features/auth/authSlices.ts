@@ -42,7 +42,7 @@ const authSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         console.log('loginAsync fulfilled', action.payload);
 
-        if (action.payload.status === true) {
+        if (action.payload.code === '00') {
           state = {
             ...state,
             loading: 'succeeded',

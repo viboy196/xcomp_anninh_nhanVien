@@ -165,6 +165,7 @@ android {
                 }
             }
         }
+        
     }
 
     if (isNewArchitectureEnabled()) {

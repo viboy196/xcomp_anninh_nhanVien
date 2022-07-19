@@ -7,14 +7,14 @@ import {loginAsync} from '../../redux/features/auth/authSlices';
 import {View, Text} from '../../components/Themed';
 import Input from '../../components/items/InputForm';
 import {RootStackScreenProps} from '../../navigation/types';
-import {validatePassword, validatePhoneNumber} from '../../utils/validate';
+import {validateName, validatePassword} from '../../utils/validate';
 import {tintColorLight} from '../../constants/Colors';
 import {AppName} from '../../utils/AppType';
 
 const Login = ({navigation}: RootStackScreenProps<'Login'>) => {
   const dispatch = useAppDispatch();
-  const [textPhone, setTextPhone] = useState('0981481527');
-  const [textPassword, setTextPassword] = useState('1');
+  const [textPhone, setTextPhone] = useState('Admin');
+  const [textPassword, setTextPassword] = useState('Admin123@');
   return (
     <View style={styles.container}>
       <View style={styles.textHeaderBackground}>
@@ -36,9 +36,7 @@ const Login = ({navigation}: RootStackScreenProps<'Login'>) => {
             icon="phone"
             color={tintColorLight}
             errorMessages={
-              validatePhoneNumber(textPhone)
-                ? undefined
-                : 'Số điện thoại không hợp lệ'
+              validateName(textPhone) ? undefined : 'Số điện thoại không hợp lệ'
             }
           />
 
